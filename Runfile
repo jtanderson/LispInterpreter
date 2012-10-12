@@ -1,0 +1,1 @@
+java LispInterpreter < input_file > output_file
