@@ -1,5 +1,4 @@
 # Joe Anderson
-## CSE-6341
 
 Running and compiling the interpreter
 ======================================
