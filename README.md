@@ -10,7 +10,7 @@ Running and compiling the interpreter
 
 * 	The project uses several custom packages, so when invoking the project with `java` the classpath must be set to the top-most directory of the 		binary files
 
-* 	A generic run command can look like this: java -cp ./bin LispInterpreter < file1 > file2
+* 	A generic run command can look like this: `java -cp ./bin LispInterpreter < file1 > file2`
 
 	* This will run the lisp interpreter taking the data from file1 as input and direct all output to file2
 
