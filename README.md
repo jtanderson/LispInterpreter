@@ -1,4 +1,5 @@
-# Joe Anderson
+# Lisp Interpreter
+## Joe Anderson
 
 Running and compiling the interpreter
 ======================================
