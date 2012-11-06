@@ -2,19 +2,31 @@
 
 # Makefile author: Joseph Anderson <jtanderson@ratiocaeli.com>
 
-# This is where you specify the necessary source files
+# This is where you specify the necessary source/package files
 
 # Program packages and files
 #	- The packages should be the path inside your src directory. eg: package1 package2/package3
-#	- The classes are at the top level of the src directory. eg: MyClass.java Test.java
+#	- All classes at the root of the src/ directory will be included.
+
 PACKAGES = helpers lexer parser 
-#JAVA_FILES = LispInterpreter.java Parser.java SExpression.java
 
 ###################### DO NOT EDIT BELOW THIS LINE #######################
 
+# Shell for any fanciness
+SHELL = /bin/bash
+
+# Make an easy-to-recognize empty string variable
+EMPTY = 
+
 # Java compiler
 JAVAC = javac
+JVM_TMP = $(subst ., , $(word 3, $(shell java -version 2>&1 | grep "java version" | awk '{print $3}' | tr -d \")))
+JVM = $(word 1, $(JVM_TMP)).$(word 2, $(JVM_TMP))
+
+ifeq ($(JVM), $(EMPTY))
 JVM = 1.6
+endif
+
 
 # Directory for compiled binaries
 BIN = ./bin/
@@ -28,8 +40,6 @@ JAVAFLAGS = -g -d $(BIN) -cp $(SRC) -target $(JVM)
 # Creating a .class file
 COMPILE = $(JAVAC) $(JAVAFLAGS)
 
-EMPTY = 
-
 JAVA_FILES = $(subst $(SRC), $(EMPTY), $(wildcard $(SRC)*.java))
 
 ifdef PACKAGES
@@ -37,7 +47,6 @@ PACKAGEDIRS = $(addprefix $(SRC), $(PACKAGES))
 PACKAGEFILES = $(subst $(SRC), $(EMPTY), $(foreach DIR, $(PACKAGEDIRS), $(wildcard $(DIR)/*.java)))
 ALL_FILES = $(PACKAGEFILES) $(JAVA_FILES)
 else
-#ALL_FILES = $(wildcard $(SRC).java)
 ALL_FILES = $(JAVA_FILES)
 endif
 

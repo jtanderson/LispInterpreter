@@ -3,10 +3,35 @@ package lexer;
 import java.io.*;
 import java.util.*;
 
+/**
+ * File: Lexer
+ * 
+ * This is the main class for the Lisp Lexical Analalyzer. It's job is to
+ * break apart the meaningful symbols in a Lisp program and put them
+ * into a vector for parsing.
+ * 
+ * @author Joseph T. Anderson <jtanderson@ratiocaeli.com>
+ * @since 2012-10-01
+ * @version 2012-11-01
+ */	
+
 public class Lexer{
 
 	private String programString = "";
 	private Vector <String> tokenArray = new Vector <String> ();
+
+	/**
+	 * Function: Lexer
+	 * 
+	 * Constructor which can take a stream as input. It reads the stream and
+	 * tokenizes it appropriately
+	 * 
+	 * @author Joseph T. Anderson <jtanderson@ratiocaeli.com>
+	 * @since 2012-11-01
+	 * @version 2012-11-01
+	 * 
+	 * @param stream An input stream
+	 */
 
 	public Lexer(InputStream stream) throws IOException{
 		byte[] bytes = new byte[1024];
@@ -16,15 +41,49 @@ public class Lexer{
         }
         tokenArray = tokenize(programString);
 	}
+	
+	/**
+	 * Function: Lexer
+	 * 
+	 * @author Joseph T. Anderson <jtanderson@ratiocaeli.com>
+	 * @since 2012-11-01
+	 * @version 2012-11-01
+	 * 
+	 * @param s A string of the program to be analyzed
+	 */
 
 	public Lexer(String s){
 		programString = s;
 		tokenArray = tokenize(programString);
 	}
+	
+	/**
+	 * Function: getTokens
+	 * 
+	 * Returns out the vector of tokens gleaned from the input program
+	 * 
+	 * @author Joseph T. Anderson <jtanderson@ratiocaeli.com>
+	 * @since 2012-11-01
+	 * @version 2012-11-01
+	 * 
+	 * @return The vector of string tokens
+	 */
 
 	public Vector <String> getTokens(){
-		return convertToDotNotation(tokenArray);
+		return tokenArray;
 	}
+	
+	/**
+	 * Function: tokenize
+	 * 
+	 * Splits a string up into chunks meaninful according to Lisp semantics
+	 * 
+	 * @author Joseph T. Anderson <jtanderson@ratiocaeli.com>
+	 * @since 2012-11-01
+	 * @version 2012-11-01
+	 * 
+	 * @param s A string to be separated according to the Lisp semantics
+	 */
 
 	private Vector <String> tokenize(String s){
 		int i = 0;
@@ -47,69 +106,28 @@ public class Lexer{
 		}
 		return tokens;
 	}
-
-	private Vector <String> convertToDotNotation(Vector <String> s){
-		Vector <String> r = new Vector <String>();
-		Vector <String> temp;
-		int nextInnerToken;
-		if ( s.get(0).matches("[(]") ){
-			// We have a list or S-Expression
-
-			int closeParen = endOfExpression(s);
-			if ( closeParen > 1 ){
-				// The expression is not ()
-
-				r.add("(");
-				if ( closeParen > 2 ){
-					// There is more than one token - so not ( a )
-
-					// Is the first one a nested expression?
-					if ( s.get(1).matches("[(]") ){
-						nextInnerToken = endOfExpression(new Vector <String>(s.subList(1, closeParen))) + 2;
-					} else {
-						nextInnerToken = 2;
-					}
-
-					if ( ! s.get(nextInnerToken).matches("[.]") ){
-						// The expression must be a list because it is not in dot-notation
-						r.addAll(convertToDotNotation(new Vector <String>(s.subList(1,nextInnerToken))));
-						r.add(".");
-						temp = new Vector <String>();
-						temp.add("(");
-						temp.addAll(s.subList(nextInnerToken, closeParen));
-						temp.add(")");
-						r.addAll(convertToDotNotation(temp));
-					} else {
-						// Since it is in the form of ( [stuff] . [stuff] ), we pass [stuff] to be converted
-						r.addAll(convertToDotNotation(new Vector <String>(s.subList(1,nextInnerToken))));
-						r.add(".");
-						r.addAll(convertToDotNotation(new Vector <String>(s.subList(nextInnerToken+1, closeParen))));
-					}
-				} else {
-					// The statement is in the form ( a )
-					r.add(s.get(1));
-					r.add(".");
-					r.add("NIL");
-				}
-				r.add(")");
-			} else {
-				// We have ()
-				r.add("NIL");
-			}
-		} else {
-			if ( s.indexOf("(") > 0 ){
-				r.addAll(s.subList(0, s.indexOf("(")));
-				r.addAll(convertToDotNotation(new Vector <String>(s.subList(s.indexOf("("), s.size()))));
-			} else {
-				r = s;	
-			}
-		}
-		return r;
-	}
-
-	public int endOfExpression(Vector <String> s) throws IllegalArgumentException, ArrayIndexOutOfBoundsException{
+	
+	/**
+	 * Function: endOfExpression
+	 * 
+	 * This function finds the index in a given string vector which denotes the closing
+	 * parenthesis of a lisp expression
+	 * 
+	 * @author Joseph T. Anderson <jtanderson@ratiocaeli.com>
+	 * @since 2012-11-01
+	 * @version 2012-11-01
+	 * 
+	 * @deprecated Not necessary as of this version. Moved to the parser to be more effective overall
+	 * 
+	 * @param s A string vector which will be analyzed. The first character must be the left parenthesis
+	 * 
+	 * @throws IllegalArgumentException If the passed vector is not a parenthetical statement
+	 * @throws ArrayIndexOutOfBounds If the expression is malformed and the statement has no closing parenthesis
+	 */	
+	
+	private int endOfExpression(Vector <String> s) throws IllegalArgumentException, ArrayIndexOutOfBoundsException{
 		if ( ! s.get(0).matches("[(]") ){
-			throw new IllegalArgumentException("ERROR: Tried to find the end of an expression that did not begin with '('.");
+			throw new IllegalArgumentException("ERROR.");
 		}
 		int openPairs = 1;
 		int end = 1;
